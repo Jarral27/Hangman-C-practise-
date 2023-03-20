@@ -4,6 +4,7 @@ using static System.Random;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Hangman
 {
@@ -11,7 +12,7 @@ namespace Hangman
     {
         private static void printHangman(int wrong)
         {
-            if(wrong == 0)
+            if (wrong == 0)
             {
                 Console.WriteLine("\n+---+");
                 Console.WriteLine("    |");
@@ -69,7 +70,7 @@ namespace Hangman
             }
         }
 
-        private static int PrintWord(List<char>guessedLetters, String randomWord)
+        private static int PrintWord(List<char> guessedLetters, String randomWord)
         {
             int counter = 0;
             int correctLetters = 0;
@@ -79,28 +80,105 @@ namespace Hangman
                 if (guessedLetters.Contains(c))
 
                 {
-                    Console.Write("c" + " ");
+                    Console.Write(c + " ");
                     correctLetters++;
                 }
                 else
-                { 
-                    Console.Write(" ");
+                {
+                    Console.Write("_ ");
                 }
                 counter++;
             }
             return correctLetters;
-                
+
         }
 
         private static void PrintLines(String randomWord)
         {
-            Console.Write("/r");
+            Console.WriteLine();
+            foreach (char c in randomWord)
+            {
+                Console.OutputEncoding = System.Text.Encoding.Unicode;
+                Console.Write("_ ");
+            }
+
 
 
         }
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Welcome to my Hangman game :D");
+            Console.WriteLine("--------------------------------------------------------");
+
+            var randomWord = GetWord();
+            PrintLines(randomWord);
+            UserInput(randomWord);
+            Console.ReadLine();
+
+        }
+        private static bool UserInput(string randomWord)
+        {
+            int incorrect = 0;
+            bool correctWord = false;
+            char input = '\0';
+            List<char> guessedLetters = new List<char>();
+
+            while (incorrect < 6 && correctWord == false)
+            {
+                Console.WriteLine("Please enter a letter!");
+                input = Console.ReadKey().KeyChar;
+                guessedLetters.Add(input);
+                if (!randomWord.Contains(input))
+                {
+                    incorrect++;
+                    printHangman(incorrect);
+                }
+                if (randomWord.All(c => guessedLetters.Contains(c)))
+                {
+                    correctWord = true;
+                }
+
+                PrintWord(guessedLetters, randomWord);
+
+            }
+            if (incorrect == 6)
+            {
+                Console.WriteLine("You Lose! :("); 
+            }
+            if (correctWord)
+            {
+                Console.WriteLine("You Win! :)");
+            }
+            return true;
+
+
+
+        }
+
+        private static string GetWord()
+        {
+            // Default folder
+            string rootFolder = "C:\\Users\\jARRAL\\source\\repos\\Hangman\\Hangman\\Themes\\";
+            //Default file. MAKE SURE TO CHANGE THIS LOCATION AND FILE PATH TO YOUR FILE
+            string textFile = "C:\\Users\\jARRAL\\source\\repos\\Hangman\\Hangman\\Themes\\animals.txt";
+
+
+
+
+            if (File.Exists(textFile))
+            {
+                // Read a text file line by line.
+                string[] lines = File.ReadAllLines(textFile);
+
+
+                Random randomGenerator = new Random();
+                int selectedNum = randomGenerator.Next(0, lines.Length - 1);
+                return lines[selectedNum];
+            }
+            return null;
+
+
         }
     }
 }
